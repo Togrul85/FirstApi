@@ -12,8 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(config.GetConnectionString("DefaulConnection"));
-
+    options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
 });
 
 var app = builder.Build();
@@ -32,3 +31,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+

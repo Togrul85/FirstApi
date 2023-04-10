@@ -1,13 +1,13 @@
 ﻿using FirstApi.Data.DAL;
+using FirstApi.Dtos.ProductDtos;
 using FirstApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FirstApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductController : ControllerBase
+
+    public class ProductController : BaseController
     {
         private readonly AppDbContext _appDbContext;
 
@@ -26,43 +26,50 @@ namespace FirstApi.Controllers
 
         [Route("{id}")]
         [HttpGet]
-        public IActionResult GetOne(int id) 
-        
+        public IActionResult GetOne(int id)
+
         {
-            Product product =_appDbContext.Products.FirstOrDefault(p => p.Id == id);
+            Product product = _appDbContext.Products.FirstOrDefault(p => p.Id == id);
             if (product == null) return StatusCode(StatusCodes.Status404NotFound);
-          
+
             return Ok(product);
         }
         [HttpPost]
-        public IActionResult AddProduct(Product product)
+        public IActionResult AddProduct(ProductCreateDto productCreateDto)
         {
-        _appDbContext.Products.Add(product);
+            Product newProduct = new()
+            {
+                Name = productCreateDto.Name,
+                SalePrice = productCreateDto.SalePrice,
+                CostPrice = productCreateDto.CostPrice,
+
+            };
+            _appDbContext.Products.Add(newProduct);
             _appDbContext.SaveChanges();
-            return StatusCode(StatusCodes.Status201Created,product);
+            return StatusCode(StatusCodes.Status201Created, newProduct);
         }
 
         [HttpDelete("{id}")]
 
-        public IActionResult DeleteProduct(int id) 
+        public IActionResult DeleteProduct(int id)
         {
-            var product = _appDbContext.Products.FirstOrDefault(p=>p.Id == id);
-            if (product==null) return NotFound();
+            var product = _appDbContext.Products.FirstOrDefault(p => p.Id == id);
+            if (product == null) return NotFound();
             _appDbContext.Products.Remove(product);
             _appDbContext.SaveChanges();
             return StatusCode(StatusCodes.Status204NoContent);
-            
+
         }
 
-        [HttpPut]
-        public IActionResult UpdateProduct( int id,Product product)
+        [HttpPut("{id}")]
+        public IActionResult UpdateProduct(int id, ProductUpdateDto productUpdateDto)
         { 
-        var existProduct =_appDbContext.Products.FirstOrDefault(p=>p.Id==product.Id);
+        var existProduct =_appDbContext.Products.FirstOrDefault(p=>p.Id==id);
             if (existProduct == null) return NotFound();
-            existProduct.Name =product.Name;
-            existProduct.SalePrice=product.SalePrice;
-            existProduct.CostPrice=product.CostPrice;
-            existProduct.IsActive =product.IsActive;
+            existProduct.Name = productUpdateDto.Name;
+            existProduct.SalePrice= productUpdateDto.SalePrice;
+            existProduct.CostPrice= productUpdateDto.CostPrice;
+            existProduct.IsActive = productUpdateDto.IsActive;
             _appDbContext.SaveChanges();
             return StatusCode(StatusCodes.Status204NoContent);
         }
